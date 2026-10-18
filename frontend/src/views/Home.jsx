@@ -14,6 +14,8 @@ import { useConnectionTrouble } from '../components/SyncBanner.jsx'
 import { Button } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
 import { glyphOf } from '../lib/glyphs.js'
+import { repMaxes, repsAt, formulaOf, FORMULA_NAMES, REP_CAP } from '../lib/onerm.js'
+import NumberField from '../components/NumField.jsx'
 import { dayNoteOf } from '../lib/day-notes.js'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
@@ -223,6 +225,8 @@ export default function Home() {
         : t("No weigh-ins yet. Log your weight to start the curve (we also ask before every workout).")}</div>}
     </div>}
 
+    <RmCalculator S={S} />
+
     <div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => calendarSheet())}>
       <div className="row between">
         <div>
@@ -235,5 +239,61 @@ export default function Home() {
         <Icon name="calendar" className="chev" style={{ fontSize: 20 }} />
       </div>
     </div>
+  </div>
+}
+
+// Weight × reps in, estimated 1RM and 2RM…10RM out, with the formula picked in Settings — for
+// choosing the weight of a set at a different rep count, and the reps a weight near it allows.
+// Nothing here is saved.
+const rowStyle = { padding: '6px 0', borderBottom: 'var(--hair) solid var(--sep)' }
+
+function RmCalculator({ S }) {
+  const [w, setW] = useState(null)
+  const [r, setR] = useState(null)
+  const formula = formulaOf(S)
+  const res = repMaxes(w, r, formula)
+  // The entered weight and five plate steps either side, heaviest first like the RM column.
+  const step = S.unit === 'lb' ? 5 : 2.5
+  const byWeight = res ? [5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5]
+    .map(k => Math.round((w + k * step) * 100) / 100)
+    .filter(x => x > 0)
+    .map(x => ({ w: x, reps: repsAt(res.oneRm, x, formula), over: x > res.oneRm }))
+    // Above the 1RM reads as "—"; past 12 reps only the heaviest such weight stays, as "12+".
+    .filter((x, i, all) => x.reps !== null || x.over || !(i > 0 && all[i - 1].reps === null && !all[i - 1].over)) : []
+  return <div className="card">
+    <div className="row between" style={{ marginBottom: 10 }}>
+      <h2 style={{ margin: 0 }}>{t('RM calculator')}</h2>
+      <span className="dim small">{formula === 'weighted' ? t('Blend of all') : FORMULA_NAMES[formula]}</span>
+    </div>
+    <div className="measure-form">
+      <label className="measure-field">
+        <span>{t('Weight ({0})', S.unit)}</span>
+        <span className="measure-input"><NumberField nullable value={w} onChange={setW} /></span>
+      </label>
+      <label className="measure-field">
+        <span>{t('Reps')}</span>
+        <span className="measure-input"><NumberField nullable decimal={false} value={r} onChange={setR} /></span>
+      </label>
+    </div>
+    {res && <>
+      <div className="row between" style={{ marginTop: 12, alignItems: 'baseline' }}>
+        <span className="muted">{t('Est. 1RM')}</span>
+        <span className="big" style={{ fontSize: 22 }}>{fmtNum(res.oneRm)} <span className="muted" style={{ fontSize: '1rem' }}>{S.unit}</span></span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 6 }}>
+        <div>
+          <div className="row between small dim" style={{ padding: '6px 0' }}><span>{t('{0}RM', '')}</span><span>{S.unit}</span></div>
+          {res.rows.map(x => <div key={x.r} className="row between small" style={rowStyle}>
+            <span className="muted">{t('{0}RM', x.r)}</span><span>{fmtNum(x.w)}</span>
+          </div>)}
+        </div>
+        <div>
+          <div className="row between small dim" style={{ padding: '6px 0' }}><span>{S.unit}</span><span>{t('Reps')}</span></div>
+          {byWeight.map(x => <div key={x.w} className="row between small" style={x.w === w ? { ...rowStyle, color: 'var(--acc)', fontWeight: 600 } : rowStyle}>
+            <span className={x.w === w ? '' : 'muted'}>{fmtNum(x.w)}</span><span>{x.reps !== null ? fmtNum(x.reps) : x.over ? '—' : REP_CAP + '+'}</span>
+          </div>)}
+        </div>
+      </div>
+    </>}
   </div>
 }

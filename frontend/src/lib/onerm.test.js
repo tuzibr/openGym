@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { estimate1RM, bestSetOf, e1rmSeries, best1RM, is1RMRecord, REP_CAP, WEIGHTED_REP_CAP, FORMULAS, calculate1RMAccuracy, formulaOf } from './onerm.js'
+import { estimate1RM, bestSetOf, e1rmSeries, best1RM, is1RMRecord, REP_CAP, WEIGHTED_REP_CAP, FORMULAS, calculate1RMAccuracy, formulaOf, repMaxes, repsAt } from './onerm.js'
 
 describe('estimate1RM', () => {
   it('returns the load unchanged for a single rep', () => {
@@ -363,5 +363,78 @@ describe('the formula a profile picked (Settings, Discord request)', () => {
     expect(best1RM(S, 'x').est).toBe(estimate1RM(100, 8, 'epley'))
     expect(best1RM({ ...S, oneRmFormula: 'brzycki' }, 'x').est).toBe(estimate1RM(100, 8, 'brzycki'))
     expect(best1RM({ ...S, oneRmFormula: 'brzycki' }, 'x').est).toBeLessThan(best1RM(S, 'x').est)
+  })
+})
+
+describe('repMaxes (Home calculator)', () => {
+  it('80 kg × 8 with Epley: 1RM 101.3, then 2RM…10RM', () => {
+    const res = repMaxes(80, 8, 'epley')
+    expect(res.oneRm).toBe(101.3)
+    expect(res.rows.map(x => x.r)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10])
+    expect(res.rows.find(x => x.r === 8).w).toBeCloseTo(80, 0)
+    expect(res.rows.find(x => x.r === 10).w).toBe(76)
+  })
+
+  it('reads every formula backwards: each row estimates back to the same 1RM', () => {
+    for (const f of [...Object.keys(FORMULAS), 'weighted']) {
+      const { oneRm, rows } = repMaxes(100, 5, f)
+      for (const row of rows) expect(estimate1RM(row.w, row.r, f)).toBeCloseTo(oneRm, 0)
+    }
+  })
+
+  it('weight falls as reps rise', () => {
+    const ws = repMaxes(60, 6, 'brzycki').rows.map(x => x.w)
+    ws.slice(1).forEach((w, i) => expect(w).toBeLessThan(ws[i]))
+  })
+
+  it('a single rep is the 1RM itself', () => {
+    expect(repMaxes(120, 1, 'epley').oneRm).toBe(120)
+  })
+
+  it('no estimate, no table: empty fields, zero, or reps past the cap', () => {
+    expect(repMaxes(null, 8)).toBeNull()
+    expect(repMaxes(80, 0)).toBeNull()
+    expect(repMaxes(0, 8)).toBeNull()
+    expect(repMaxes(80, REP_CAP + 1, 'epley')).toBeNull()
+  })
+})
+
+describe('repsAt (Home calculator, weight → reps)', () => {
+  it('gives the logged set back: 75 kg × 8 → 75 kg allows 8', () => {
+    const { oneRm } = repMaxes(75, 8, 'epley')
+    expect(repsAt(oneRm, 75, 'epley')).toBe(8)
+  })
+
+  it('has a decimal between rep counts: Epley, 95 kg 1RM, 72.5 kg → 9.3', () => {
+    expect(repsAt(95, 72.5, 'epley')).toBe(9.3)
+  })
+
+  it('agrees with the RM table for every formula', () => {
+    for (const f of [...Object.keys(FORMULAS), 'weighted']) {
+      const { oneRm, rows } = repMaxes(100, 5, f)
+      for (const row of rows) expect(Math.abs(repsAt(oneRm, row.w, f) - row.r), `${f} ${row.r}RM`).toBeLessThanOrEqual(0.1)
+    }
+  })
+
+  it('more weight, fewer reps', () => {
+    const { oneRm } = repMaxes(75, 8, 'brzycki')
+    const reps = [70, 72.5, 75, 77.5, 80, 82.5].map(w => repsAt(oneRm, w, 'brzycki'))
+    reps.slice(1).forEach((r, i) => expect(r).toBeLessThan(reps[i]))
+  })
+
+  it('the 1RM itself is one rep, anything above it is none', () => {
+    expect(repsAt(100, 100, 'epley')).toBe(1)
+    expect(repsAt(100, 100.5, 'epley')).toBeNull()
+  })
+
+  it('nothing past 12 reps, whatever the formula', () => {
+    expect(repsAt(100, 40, 'epley')).toBeNull()
+    expect(repsAt(100, 40, 'weighted')).toBeNull()
+  })
+
+  it('nothing to say for an empty or zero weight', () => {
+    expect(repsAt(100, 0)).toBeNull()
+    expect(repsAt(100, null)).toBeNull()
+    expect(repsAt(null, 50)).toBeNull()
   })
 })

@@ -740,6 +740,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': 'Bester Satz',
   'Est. 1RM': 'gesch. 1RM',
+  'RM calculator': 'RM-Rechner',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': 'Noch keine Einheiten eingetragen',
   '{0} session': '{0} Einheit',
   '{0} sessions': '{0} Einheiten',

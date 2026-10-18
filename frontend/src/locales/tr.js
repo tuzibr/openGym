@@ -721,6 +721,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': 'En iyi set',
   'Est. 1RM': 'Tah. 1RM',
+  'RM calculator': 'RM hesaplayıcı',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': 'Henüz kayıtlı seans yok',
   '{0} session': '{0} seans',
   '{0} sessions': '{0} seans',

@@ -710,6 +710,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': '最佳組 / 最大重量組',
   'Est. 1RM': '預估 1RM',
+  'RM calculator': 'RM 計算器',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': '尚未記錄任何訓練',
   '{0} session': '{0} 次訓練',
   '{0} sessions': '{0} 次訓練',

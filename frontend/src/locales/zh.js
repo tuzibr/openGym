@@ -721,6 +721,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': '最佳组',
   'Est. 1RM': '预估 1RM',
+  'RM calculator': 'RM 计算器',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': '尚未记录任何训练',
   '{0} session': '{0} 次训练',
   '{0} sessions': '{0} 次训练',

@@ -705,6 +705,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': 'Лучший подход',
   'Est. 1RM': 'Расч. 1ПМ',
+  'RM calculator': 'Калькулятор ПМ',
+  '{0}RM': '{0}ПМ',
   'No sessions logged yet': 'Записанных сессий пока нет',
   'Exercise history': 'История упражнения',
   'Last {0} sessions': 'Последние {0} сессий',

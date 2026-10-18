@@ -220,3 +220,45 @@ export function calculate1RMAccuracy(reps, rir = null, formula = 'weighted') {
 
   return Math.round(repFactor * rirFactor * spreadFactor * 100) / 100
 }
+
+// The Home calculator: estimate a 1RM from one set (weight × reps) with the profile's formula,
+// then read the same formula backwards for what that 1RM says you could lift for 2…upTo reps.
+// Every formula is linear in the load (est = w · g(r)), so the weight for r reps is 1RM / g(r),
+// which keeps the table consistent with the 1RM above it. null when the set has no estimate.
+export function repMaxes(w, r, formula = DEFAULT_FORMULA, upTo = 10) {
+  const oneRm = estimate1RM(w, r, formula)
+  if (oneRm === null) return null
+  const rows = []
+  for (let n = 2; n <= upTo; n++) rows.push({ r: n, w: weightForReps(oneRm, n, formula) })
+  return { oneRm, rows }
+}
+
+// What a 1RM says you could lift for n reps to failure, rounded like every estimate here.
+function weightForReps(oneRm, n, formula) {
+  if (n === 1) return oneRm
+  const fn = FORMULAS[formula] || FORMULAS[DEFAULT_FORMULA]
+  const g = formula === 'weighted' ? weightedEstimate(1, n) : fn(1, n)
+  return Math.round(oneRm / g * 10) / 10
+}
+
+// The other direction, for the calculator's second table: how many reps a weight allows, to one
+// decimal. Solves w = 1RM / g(r) for r on the same g the RM table uses, so a weight read off that
+// table gives its rep count back. Between 1 and 2 reps g is drawn as a straight line from 1 (a
+// single is the 1RM itself) to g(2). null above the 1RM, and past REP_CAP — the calculator stops
+// at 12 for every formula, where the formulas stop agreeing on anything.
+export function repsAt(oneRm, weight, formula = DEFAULT_FORMULA) {
+  const max = Number(oneRm), w = Number(weight)
+  if (!isFinite(max) || !isFinite(w) || max <= 0 || w <= 0 || w > max) return null
+  const fn = FORMULAS[formula] || FORMULAS[DEFAULT_FORMULA]
+  const g2 = formula === 'weighted' ? weightedEstimate(1, 2) : fn(1, 2)
+  const g = r => r <= 2 ? 1 + (g2 - 1) * (r - 1) : formula === 'weighted' ? weightedEstimate(1, r) : fn(1, r)
+  const target = max / w
+  if (g(REP_CAP) < target) return null
+  let lo = 1, hi = REP_CAP
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2
+    if (g(mid) < target) lo = mid
+    else hi = mid
+  }
+  return Math.round(hi * 10) / 10
+}

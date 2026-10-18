@@ -803,6 +803,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': 'সেরা সেট',
   'Est. 1RM': 'আনুমানিক 1RM',
+  'RM calculator': 'RM ক্যালকুলেটর',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': 'এখনও কোনো সেশন লগ করা হয়নি',
   '{0} session': '{0}টি সেশন',
   '{0} sessions': '{0}টি সেশন',

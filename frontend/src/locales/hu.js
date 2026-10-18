@@ -696,6 +696,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': 'Legjobb sorozat',
   'Est. 1RM': 'becs. 1RM',
+  'RM calculator': 'RM-kalkulátor',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': 'Még nincs rögzített edzés',
   '{0} session': '{0} edzés',
   '{0} sessions': '{0} edzés',

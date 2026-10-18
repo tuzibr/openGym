@@ -579,6 +579,8 @@ export default {
   'Discard the running workout': 'تجاهل التمرين الجاري',
   'Top set': 'المجموعة الأثقل',
   'Est. 1RM': '1RM تقديري',
+  'RM calculator': 'حاسبة RM',
+  '{0}RM': '{0}RM',
   'Estimated 1RM': '1RM تقديري',
   'Estimated 1RM per workout': '1RM تقديري لكل تمرين',
   'Best estimate from {0} on {1}. An estimate, not a tested max.': 'أفضل تقدير من {0} بتاريخ {1}. تقدير، وليس حدًا أقصى مُختبَرًا.',

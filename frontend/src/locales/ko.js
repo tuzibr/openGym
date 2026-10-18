@@ -721,6 +721,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': '최고 세트',
   'Est. 1RM': '추정 1RM',
+  'RM calculator': 'RM 계산기',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': '기록된 세션이 아직 없습니다',
   '{0} session': '세션 {0}회',
   '{0} sessions': '세션 {0}회',

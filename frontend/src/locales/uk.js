@@ -546,6 +546,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': 'Найкращий підхід',
   'Est. 1RM': 'Розр. 1ПМ',
+  'RM calculator': 'Калькулятор ПМ',
+  '{0}RM': '{0}ПМ',
   'Estimated 1RM': 'Розрахунковий 1ПМ',
   'Estimated 1RM per workout': 'Розрахунковий 1ПМ за тренування',
   'Best estimate from {0} on {1}. An estimate, not a tested max.': 'Найкраща оцінка за {0} від {1}. Це розрахунок, а не перевірений максимум.',

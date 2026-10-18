@@ -721,6 +721,8 @@ export default {
   // --- v1.2.2: timed sets, progression, estimated 1RM (#16 #17 #18) ---
   'Top set': 'Mejor serie',
   'Est. 1RM': '1RM est.',
+  'RM calculator': 'Calculadora de RM',
+  '{0}RM': '{0}RM',
   'No sessions logged yet': 'Aún no hay sesiones registradas',
   '{0} session': '{0} sesión',
   '{0} sessions': '{0} sesiones',
