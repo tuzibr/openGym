@@ -17,6 +17,7 @@ import { glyphOf } from '../lib/glyphs.js'
 import { repMaxes, repsAt, formulaOf, FORMULA_NAMES, REP_CAP } from '../lib/onerm.js'
 import NumberField from '../components/NumField.jsx'
 import { dayNoteOf } from '../lib/day-notes.js'
+import { weighInAt } from '../lib/bodyweight.js'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -94,7 +95,7 @@ export default function Home() {
   // The streak card's fraction: this calendar week's workouts over the weekdays with a plan, or,
   // in a coach week, the queue's sessions and your own days together (lib/queue.js weekTally).
   const { done: doneThisWeek, planned: plannedPerWeek } = weekTally(S, todayISO())
-  const bwPoints = S.bodyweight.slice(-30).map(b => ({ t: b.t || new Date(b.d).getTime(), y: b.w, d: b.d }))
+  const bwPoints = S.bodyweight.slice(-30).map(b => ({ t: weighInAt(b), y: b.w, d: b.d }))
 
   // today's session shown right under the week strip
   const onToday = () => { if (S.active) nav('/workout'); else if (todayRoutines.length) startFlow(effectiveRoutineIds(S, todayISO())); else dayOverrideSheet(todayISO()) }
@@ -258,7 +259,7 @@ function RmCalculator({ S }) {
     .map(k => Math.round((w + k * step) * 100) / 100)
     .filter(x => x > 0)
     .map(x => ({ w: x, reps: repsAt(res.oneRm, x, formula), over: x > res.oneRm }))
-    // Above the 1RM reads as "—"; past 12 reps only the heaviest such weight stays, as "12+".
+    // Above the 1RM reads as "–"; past 12 reps only the heaviest such weight stays, as "12+".
     .filter((x, i, all) => x.reps !== null || x.over || !(i > 0 && all[i - 1].reps === null && !all[i - 1].over)) : []
   return <div className="card">
     <div className="row between" style={{ marginBottom: 10 }}>
@@ -290,7 +291,7 @@ function RmCalculator({ S }) {
         <div>
           <div className="row between small dim" style={{ padding: '6px 0' }}><span>{S.unit}</span><span>{t('Reps')}</span></div>
           {byWeight.map(x => <div key={x.w} className="row between small" style={x.w === w ? { ...rowStyle, color: 'var(--acc)', fontWeight: 600 } : rowStyle}>
-            <span className={x.w === w ? '' : 'muted'}>{fmtNum(x.w)}</span><span>{x.reps !== null ? fmtNum(x.reps) : x.over ? '—' : REP_CAP + '+'}</span>
+            <span className={x.w === w ? '' : 'muted'}>{fmtNum(x.w)}</span><span>{x.reps !== null ? fmtNum(x.reps) : x.over ? '–' : REP_CAP + '+'}</span>
           </div>)}
         </div>
       </div>
